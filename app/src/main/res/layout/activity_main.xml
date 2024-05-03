@@ -23,15 +23,12 @@
             app:srcCompat="@drawable/logo" />
 
 
-
         <androidx.cardview.widget.CardView
-            app:cardCornerRadius="30dp"
-            app:cardElevation="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-            android:layout_marginTop="-50dp">
-
+            app:cardCornerRadius="30dp"
+            app:cardElevation="20dp">
 
 
             <LinearLayout
@@ -46,6 +43,7 @@
                     android:id="@+id/Text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
                     android:gravity="center"
                     android:text="File Tracker"
                     android:textAlignment="center"
@@ -56,21 +54,20 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/outlinedTextField1"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
 
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_height="wrap_content">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:id="@+id/idEmployee"
-                    android:layout_marginTop="40dp"
-                    android:drawableStart="@drawable/login_vector"
-                    android:drawablePadding="8dp"
-                    android:hint="Employee Name" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/idEmployee"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="40dp"
+                        android:drawableStart="@drawable/login_vector"
+                        android:drawablePadding="8dp"
+                        android:hint="Username" />
                 </com.google.android.material.textfield.TextInputLayout>
-
 
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -82,15 +79,13 @@
                     <AutoCompleteTextView
                         android:id="@+id/idDivision"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="60dp"
                         android:layout_marginTop="20dp"
-                        android:contentDescription="Enter Division"
                         android:drawableStart="@drawable/login_vector"
                         android:drawablePadding="8dp"
                         android:hint="Division" />
 
                 </com.google.android.material.textfield.TextInputLayout>
-
 
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -100,33 +95,32 @@
                     android:layout_height="wrap_content"
                     app:endIconMode="password_toggle">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="20dp"
-                    android:drawableStart="@drawable/password_svgrepo_com"
-                    android:drawablePadding="8dp"
-                    android:hint="Password"
-                    android:inputType="textPassword|textPersonName"/>
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:layout_marginTop="20dp"
+                        android:drawableStart="@drawable/password_svgrepo_com"
+                        android:drawablePadding="8dp"
+                        android:hint="Password"
+                        android:inputType="textPassword|textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-<!--                <Spinner-->
-<!--                    android:id="@+id/spinnerDivision"-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="wrap_content"/>-->
-
+                <!--                <Spinner-->
+                <!--                    android:id="@+id/spinnerDivision"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"/>-->
 
 
                 <Button
                     android:id="@+id/Login"
-                    app:cornerRadius="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:layout_marginTop="30dp"
                     android:backgroundTint="@color/purple"
                     android:text="Login"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    app:cornerRadius="20dp" />
 
             </LinearLayout>
 

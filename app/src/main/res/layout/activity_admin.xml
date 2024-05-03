@@ -1,66 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-        tools:context=".Admin"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Admin">
+
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-    <!-- QR Scanner Section -->
+        <com.google.android.material.appbar.MaterialToolbar
+            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:menu="@menu/top_app_bar"
+            app:navigationIcon="@drawable/ic_menu"
+            app:title="FileTracker" />
 
-    <!-- Employee Name Input -->
-    <EditText
-        android:id="@+id/employee"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Employee Name" />
+        <!-- NestedScrollingChild goes here (NestedScrollView, RecyclerView, etc.). -->
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/searchbar_scrolling_view_behavior">
+            <!-- Screen content goes here. -->
+            <com.google.android.material.search.SearchBar
+                android:id="@+id/search_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Text to Search" />
+        </androidx.core.widget.NestedScrollView>
 
-    <!-- Track File Section -->
-    <EditText
-        android:id="@+id/DivisionText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Enter Division"
-        android:minHeight="48dp" />
 
-    <!-- Search Button -->
-    <Button
-        android:id="@+id/add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Add" />
+        <com.google.android.material.search.SearchView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Enter Code"
+            app:layout_anchor="@id/search_bar">
+            <!-- Search suggestions/results go here (ScrollView, RecyclerView, etc.). -->
+        </com.google.android.material.search.SearchView>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <Button
-        android:id="@+id/btnList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View" />
 
-    <!-- Results Table -->
-    <Button
+    <!-- Main content -->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/scanQRButton"
+        style="?attr/floatingActionButtonLargeStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR Code"
-        android:onClick="scanQrCode"
-        />
-    <Button
-        android:id="@+id/btnFetchData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fetch Employee Data"
-        android:layout_centerInParent="true"/>
+        android:layout_gravity="bottom|center"
+        android:layout_margin="10dp"
+        app:srcCompat="@drawable/baseline_camera_alt_24" />
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/btnFetchData"/>
-<!--    <TableLayout-->
-<!--        android:id="@+id/resultsTable"-->
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+
+    <!--    &lt;!&ndash; Employee Name Input &ndash;&gt;-->
+<!--    <EditText-->
+<!--        android:id="@+id/employee"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="wrap_content"-->
-<!--        android:stretchColumns="*">-->
+<!--        android:hint="Enter Employee Name" />-->
 
-<!--    </TableLayout>-->
-    </LinearLayout>
+<!--    &lt;!&ndash; Track File Section &ndash;&gt;-->
+<!--    <EditText-->
+<!--        android:id="@+id/DivisionText"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Enter Division"-->
+<!--        android:minHeight="48dp" />-->
+
+<!--    &lt;!&ndash; Search Button &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/add"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Add" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/btnList"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="View" />-->
+
+<!--    &lt;!&ndash; Results Table &ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/scanQRButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Scan QR Code"-->
+<!--        android:onClick="scanQrCode"-->
+<!--        />-->
+<!--    <Button-->
+<!--        android:id="@+id/btnFetchData"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Fetch Employee Data"-->
+<!--        android:layout_centerInParent="true"/>-->
+
+<!--    <ListView-->
+<!--        android:id="@+id/listView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_below="@id/btnFetchData"/>-->
+<!--&lt;!&ndash;    <TableLayout&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/resultsTable"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:stretchColumns="*">&ndash;&gt;-->
+
+<!--&lt;!&ndash;    </TableLayout>&ndash;&gt;-->

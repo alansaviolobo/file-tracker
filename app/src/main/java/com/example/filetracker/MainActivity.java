@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
-    private EditText employeeEditText, divisionEditText,editTextPassword;
+    private EditText employeeEditText, divisionEditText, editTextPassword;
     private DBHandler dbHandler;
 
     @Override
@@ -46,10 +46,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize UI elements
         employeeEditText = findViewById(R.id.idEmployee);
-       divisionEditText = findViewById(R.id.idDivision);
+        divisionEditText = findViewById(R.id.idDivision);
         Button loginButton = findViewById(R.id.Login);
         editTextPassword = findViewById(R.id.password);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
 
 
         //--------------------------------------------------------------------------------------------//
@@ -64,13 +65,13 @@ public class MainActivity extends AppCompatActivity {
                 String password = editTextPassword.getText().toString();
 
 
-
-                         // Check if all fields are not empty
+                // Check if all fields are not empty
                 if (!employeeName.isEmpty() && !division.isEmpty() && password.equals("goawrd2000")) {
                     // Check if the employee exists in the database
                     if (dbHandler.isEmployeeExists(employeeName, division)) {
                         // Employee exists, navigate to the next activity
                         Intent intent = new Intent(MainActivity.this, Admin.class);
+                        intent.putExtra("USERNAME", employeeName);
                         startActivity(intent);
                     } else {
                         // Employee does not exist, show a dialog to create a new record
@@ -82,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
 
 
         // Create an instance of DBHandler
@@ -108,8 +108,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
     //--------------------------------------------------------------------------------------------//
-                            //Csv Link
+    //Csv Link
     private void downloadAndStoreCSVData() {
         // URL of the CSV file to download
         String csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnjsCiY_MV7PBvE8qkUjSqSuFrfyAQlpuoDbJ2WsItmd4LmswTjsTkFc-GQ6z2-Uluqn4fOC299enn/pub?gid=1956630541&single=true&output=csv";
@@ -120,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
     //--------------------------------------------------------------------------------------------//
 
-                       //Background Task Network + Csv Data parse
+    //Background Task Network + Csv Data parse
     private class DownloadCSVTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -193,9 +194,9 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "Done.", Toast.LENGTH_SHORT).show();
     }
 
-       //--------------------------------------------------------------------------------------------//
+    //--------------------------------------------------------------------------------------------//
 
-//     Method to check if a record already exists in the database
+    //     Method to check if a record already exists in the database
     private boolean isRecordExists(SQLiteDatabase db, String employeeName, String division) {
         Cursor cursor = db.rawQuery("SELECT * FROM File WHERE EmployeeName = ? AND Division = ?", new String[]{employeeName, division});
         boolean exists = cursor.getCount() > 0;
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//    // Method to show a dialog to create a new employee record
+    //    // Method to show a dialog to create a new employee record
 //    private void showCreateNewEmployeeDialog(final String employeeName, final String division) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 //        builder.setTitle("Create New Employee Record");
@@ -234,9 +235,10 @@ public class MainActivity extends AppCompatActivity {
 //        // Show the dialog
 //        builder.create().show();
 //    }
-private void createEmployeeLocally(String employeeName, String division) {
-    // Insert the new employee into the local database
-    dbHandler.insertData(employeeName, division);
-}
+    private void createEmployeeLocally(String employeeName, String division) {
+        // Insert the new employee into the local database
+        dbHandler.insertData(employeeName, division);
+    }
 
+    // Define a method to start the Admin activity with the username
 }

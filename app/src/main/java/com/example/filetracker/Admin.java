@@ -1,59 +1,32 @@
 package com.example.filetracker;
-
-import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import android.os.Bundle;
+import android.text.InputType;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-
-
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-
-
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import android.os.AsyncTask;
-
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-import java.io.*;
-
-
-public class Admin extends AppCompatActivity implements  View.OnClickListener {
-
-    // creating variables for our edittext, button and dbhandler
-    private EditText EmployeeName, DivisionName;
-    private Button addBtn, readBtn, scanBtn;
-    private DBHandler dbHandler;
-
-    //Apache POI
-    private Button btnFetchData;
-    private ListView listView;
-    private ArrayAdapter<String> adapter;
-    private ArrayList<String> employeeNames;
-    private static final String EXCEL_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnjsCiY_MV7PBvE8qkUjSqSuFrfyAQlpuoDbJ2WsItmd4LmswTjsTkFc-GQ6z2-Uluqn4fOC299enn/pub?gid=1956630541&single=true&output=csv";
-    private static final String FILE_NAME = "employees.xlsx"; // Local file name
+public class Admin extends AppCompatActivity implements View.OnClickListener {
 
     // URLs for API endpoints
     private static final String URL2 = "https://goawrd.gov.in/file-tracker/scan?code=<code>&employee=<employee>&username=<username>";
@@ -64,224 +37,214 @@ public class Admin extends AppCompatActivity implements  View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
 
-
-        // initializing all our variables.
-        EmployeeName = findViewById(R.id.employee);
-        DivisionName = findViewById(R.id.DivisionText);
-        readBtn = findViewById(R.id.btnList);
-        addBtn = findViewById(R.id.add);
-        scanBtn = findViewById(R.id.scanQRButton);
-
+        FloatingActionButton scanBtn = findViewById(R.id.scanQRButton);
         scanBtn.setOnClickListener(this);
-
-        //Apache POI
-        btnFetchData = findViewById(R.id.btnFetchData);
-        listView = findViewById(R.id.listView);
-        employeeNames = new ArrayList<>();
-        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, employeeNames);
-        listView.setAdapter(adapter);
-
-        btnFetchData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fetchDataFromServer();
-            }
-        });
-
-        // creating a new dbhandler class
-        // and passing our context to it.
-        dbHandler = new DBHandler(Admin.this);
-
-        // below line is to add on click listener for our add course button.
-        addBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                // below line is to get data from all edit text fields.
-                String Name = EmployeeName.getText().toString();
-                String Division = DivisionName.getText().toString();
-
-
-                // validating if the text fields are empty or not.
-                if (Name.isEmpty()) {
-                    Toast.makeText(Admin.this, "Please enter all the data..", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (Division.isEmpty()) {
-                    Toast.makeText(Admin.this, "Please enter all the data..", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // on below line we are calling a method to add new
-                // course to sqlite data and pass all our values to it.
-//                dbHandler.addNewCourse(Name, Division);
-
-                // after adding the data we are displaying a toast message.
-                Toast.makeText(Admin.this, "Course has been added.", Toast.LENGTH_SHORT).show();
-                EmployeeName.setText("");
-                DivisionName.setText("");
-
-            }
-        });
-
-
-        readBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // opening a new activity via a intent.
-                Intent i = new Intent(Admin.this, DataView.class);
-                startActivity(i);
-            }
-        });
-
-
+        String username = getIntent().getStringExtra("USERNAME");
+        if (username != null) {
+            Toast.makeText(this, "Welcome, " + username, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
-
     public void onClick(View view) {
-        // we need to create the object
-        // of IntentIntegrator class
-        // which is the class of QR library
-
-
-        IntentIntegrator intentIntegrator = new IntentIntegrator(this);
-        intentIntegrator.setPrompt("Scan a barcode or QR Code");
-        intentIntegrator.setOrientationLocked(true);
-        intentIntegrator.initiateScan();
+        if (view.getId() == R.id.scanQRButton) {
+            if (NetworkUtils.isNetworkConnected(getApplicationContext())) {
+                IntentIntegrator intentIntegrator = new IntentIntegrator(this);
+                intentIntegrator.setPrompt("Scan a barcode or QR Code");
+                intentIntegrator.setOrientationLocked(true);
+                intentIntegrator.initiateScan();
+            } else {
+                Toast.makeText(Admin.this, "No internet connection", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (intentResult != null) {
-            if (intentResult.getContents() != null) {
-                String scannedData = intentResult.getContents();
-                // Assuming the scanned data is in vCard format
-                String[] parts = scannedData.split("\n");
-                String firstName = "", lastName = "";
-                for (String part : parts) {
-                    if (part.startsWith("FN:")) {
-                        // Extract first name
-                        firstName = part.substring(3);
-                    } else if (part.startsWith("N:")) {
-                        // Extract last name
-                        String[] nameParts = part.substring(2).split(";");
-                        lastName = nameParts[0];
-                    }
-                }
-                // Assuming you have EditText fields for first name and last name
-                EmployeeName.setText(firstName);
-                DivisionName.setText(lastName);
-            } else {
-                // QR code scanning canceled
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-
-    private void fetchDataFromServer() {
-        new FetchDataTask().execute(EXCEL_URL);
-    }
-
-    private class FetchDataTask extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... params) {
-            String csvUrl = params[0];
-            try {
-                URL url = new URL(csvUrl);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.connect();
-
-                int responseCode = connection.getResponseCode();
-                if (responseCode == HttpURLConnection.HTTP_OK) {
-                    InputStream inputStream = connection.getInputStream();
-                    FileOutputStream outputStream = openFileOutput(FILE_NAME, MODE_PRIVATE);
-                    byte[] buffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                    }
-                    outputStream.close();
-                    inputStream.close();
-
-                    return true;
+        if (requestCode == IntentIntegrator.REQUEST_CODE) {
+            IntentResult intentResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            if (intentResult != null) {
+                if (intentResult.getContents() != null) {
+                    String scannedData = intentResult.getContents();
+                    String username = getIntent().getStringExtra("USERNAME");
+                    Toast.makeText(this, "Scanned data: " + scannedData, Toast.LENGTH_SHORT).show();
+                    openDialogForEmployeeName(scannedData, username);
                 } else {
-                    return false;
+                    Toast.makeText(this, "Scan canceled or failed", Toast.LENGTH_SHORT).show();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                new ReadCsvTask().execute();
-            } else {
-                Toast.makeText(Admin.this, "Failed to download CSV file", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    private void openDialogForEmployeeName(final String scannedData, final String username) {
+        final String[] parts = scannedData.split(";");
+        final String code = parts[0];
 
-    private class ReadCsvTask extends AsyncTask<Void, Void, Boolean> {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Employee Name");
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_enter_employee_name, null);
+        final EditText inputEmployeeName = dialogView.findViewById(R.id.input_employee_name);
+        final TextView textCode = dialogView.findViewById(R.id.text_code);
+        final TextView textUsername = dialogView.findViewById(R.id.text_username);
+        textCode.setText("Code: " + code);
+        textUsername.setText("Username: " + username);
+        builder.setView(dialogView);
 
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            try {
-                FileInputStream fileInputStream = openFileInput(FILE_NAME);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputStream));
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String employeeName = inputEmployeeName.getText().toString().trim();
+                if (!employeeName.isEmpty()) {
+                    sendRequestToURL2(code, username, employeeName);
+                    Toast.makeText(Admin.this, "Submitted....", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(Admin.this, "Please enter employee name", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
 
-                SQLiteDatabase db = dbHandler.getWritableDatabase();
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    // Process each line of the CSV file
-                    String[] values = line.split(","); // Assuming CSV is comma-separated
-                    if (values.length >= 2) {
-                        String name = values[1]; // Extract value from column 1
-                        String division = values[0]; // Extract value from column 2
+    private void sendRequestToURL2(final String code, final String username, final String employeeName) {
+        String url = URL2.replace("<code>", code)
+                .replace("<username>", username)
+                .replace("<employee>", employeeName);
 
-                        // Create a ContentValues object to store the data
-                        ContentValues contentValues = new ContentValues();
-                        contentValues.put("EmployeeName", name); // Replace with actual column name
-                        contentValues.put("Division", division); // Replace with actual column name
+        Log.d("Admin", "URL2: " + url);
 
-                        // Insert the data into the database
-                        db.insert("File", null, contentValues); // Replace with actual table name
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // Set connection timeout
+                .readTimeout(30, TimeUnit.SECONDS)    // Set read timeout
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Admin.this, "Error: Network failure", Toast.LENGTH_SHORT).show();
                     }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseBody = response.body().string();
+                    if (responseBody.equals("Ok")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(Admin.this, "Entry saved in database", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else if (responseBody.equals("File not in System")) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                promptForFilename(code);
+                            }
+                        });
+                    }
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Admin.this, "Error: Unsuccessful response", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
-
-                reader.close();
-                fileInputStream.close();
-                db.close(); // Close the database connection
-
-                return true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
             }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                adapter.notifyDataSetChanged();
-                Toast.makeText(Admin.this, "Employee data fetched and saved successfully", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(Admin.this, "Failed to read CSV file or save data to database", Toast.LENGTH_SHORT).show();
-            }
-        }
+        });
     }
-    
 
+    private void promptForFilename(final String code) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Filename");
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String filename = input.getText().toString().trim();
+                if (!filename.isEmpty()) {
+                    sendRequestToURL3(code, filename);
+                } else {
+                    Toast.makeText(Admin.this, "Please enter filename", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void sendRequestToURL3(final String code, final String filename) {
+        String url = URL3.replace("<code>", code)
+                .replace("<filename>", filename);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // Set connection timeout
+                .readTimeout(30, TimeUnit.SECONDS)    // Set read timeout
+                .build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Admin.this, "Error: Network failure", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    final String responseBody = response.body().string();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Admin.this, "Response from URL3: " + responseBody, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(Admin.this, "Error: Unsuccessful response", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+    }
 }

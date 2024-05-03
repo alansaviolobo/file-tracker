@@ -29,6 +29,7 @@ android {
 }
 
 
+
 dependencies {
 
     implementation libs.appcompat
@@ -37,13 +38,20 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.filament.android
     implementation libs.firebase.database
-    testImplementation libs.junit
+    implementation libs.volley
+
+     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
-   // implementation 'org.apache.poi:poi:4.1.2'
+   // implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'org.apache.poi:poi:5.2.5'
-    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+    implementation 'com.android.volley:volley:1.2.1'
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+
 
 
 }
