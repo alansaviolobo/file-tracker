@@ -6,10 +6,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -36,12 +38,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String PREF_LOGGED_IN = "loggedIn";
     private EditText employeeEditText, divisionEditText, editTextPassword;
     private DBHandler dbHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Check if user is already logged in
+        // Check if the user is already logged in
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean loggedIn = sharedPreferences.getBoolean(PREF_LOGGED_IN, false);
+        if (loggedIn) {
+            // If already logged in, directly navigate to Admin activity
+            String username = sharedPreferences.getString("USERNAME", "");
+            if (!username.isEmpty()) {
+                Intent intent = new Intent(MainActivity.this, Admin.class);
+                intent.putExtra("USERNAME", username);
+                startActivity(intent);
+                finish(); // Finish MainActivity so the user cannot go back to it
+                return;
+            }
+        }
         setContentView(R.layout.activity_main);
 
         // Initialize UI elements
@@ -69,10 +87,23 @@ public class MainActivity extends AppCompatActivity {
                 if (!employeeName.isEmpty() && !division.isEmpty() && password.equals("goawrd2000")) {
                     // Check if the employee exists in the database
                     if (dbHandler.isEmployeeExists(employeeName, division)) {
-                        // Employee exists, navigate to the next activity
+
+
+                        // Update login status to true
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putBoolean(PREF_LOGGED_IN, true);
+                        editor.putString("USERNAME", employeeName); // Store the username
+                        editor.apply();
+
+                        // Employee exists, navigate to the Admin activity
                         Intent intent = new Intent(MainActivity.this, Admin.class);
                         intent.putExtra("USERNAME", employeeName);
                         startActivity(intent);
+
+                        // Finish MainActivity so the user cannot go back to it
+                        finish();
+
+
                     } else {
                         // Employee does not exist, show a dialog to create a new record
                         createEmployeeLocally(employeeName, division);
@@ -81,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     // Fields are empty
                     Toast.makeText(MainActivity.this, "Please enter employee name, division, and Password", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
 
@@ -205,36 +237,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //    // Method to show a dialog to create a new employee record
-//    private void showCreateNewEmployeeDialog(final String employeeName, final String division) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("Create New Employee Record");
-//        builder.setMessage("Employee name '" + employeeName + "' does not exist. Do you want to create a new record with division '" + division + "'?");
-//
-//        // Add buttons to the dialog
-//        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // Insert new employee record into the database
-//                dbHandler.insertData(employeeName, division);
-//
-//                // Navigate to the next activity (Admin activity)
-//                Intent intent = new Intent(MainActivity.this, Admin.class);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                // User chose not to create a new record, do nothing
-//                dialog.dismiss();
-//            }
-//        });
-//
-//        // Show the dialog
-//        builder.create().show();
-//    }
     private void createEmployeeLocally(String employeeName, String division) {
         // Insert the new employee into the local database
         dbHandler.insertData(employeeName, division);
