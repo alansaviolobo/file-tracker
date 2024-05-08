@@ -52,9 +52,11 @@ public class MainActivity extends AppCompatActivity {
         if (loggedIn) {
             // If already logged in, directly navigate to Admin activity
             String username = sharedPreferences.getString("USERNAME", "");
+            String division = sharedPreferences.getString("DIVISION", "");
             if (!username.isEmpty()) {
                 Intent intent = new Intent(MainActivity.this, Admin.class);
                 intent.putExtra("USERNAME", username);
+                intent.putExtra("DIVISION", division);
                 startActivity(intent);
                 finish(); // Finish MainActivity so the user cannot go back to it
                 return;
@@ -82,62 +84,57 @@ public class MainActivity extends AppCompatActivity {
                 String division = divisionEditText.getText().toString().trim();
                 String password = editTextPassword.getText().toString();
 
-
                 // Check if all fields are not empty
-                if (!employeeName.isEmpty() && !division.isEmpty() && password.equals("goawrd2000")) {
-                    // Check if the employee exists in the database
-                    if (dbHandler.isEmployeeExists(employeeName, division)) {
+                if (!employeeName.isEmpty() && !division.isEmpty() && !password.isEmpty()) {
+                    // Insert data into the Users table
+                    dbHandler.insertUserData(employeeName, division);
 
+                    // Update login status to true
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean(PREF_LOGGED_IN, true);
+                    editor.putString("USERNAME", employeeName);// Store the username
+                    editor.putString("DIVISION",division);
+                    editor.apply();
 
-                        // Update login status to true
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putBoolean(PREF_LOGGED_IN, true);
-                        editor.putString("USERNAME", employeeName); // Store the username
-                        editor.apply();
+                    // Navigate to the Admin activity
+                    Intent intent = new Intent(MainActivity.this, Admin.class);
+                    intent.putExtra("USERNAME", employeeName);
+                    intent.putExtra("DIVISION", division);
 
-                        // Employee exists, navigate to the Admin activity
-                        Intent intent = new Intent(MainActivity.this, Admin.class);
-                        intent.putExtra("USERNAME", employeeName);
-                        startActivity(intent);
+                    startActivity(intent);
 
-                        // Finish MainActivity so the user cannot go back to it
-                        finish();
-
-
-                    } else {
-                        // Employee does not exist, show a dialog to create a new record
-                        createEmployeeLocally(employeeName, division);
-                    }
+                    // Finish MainActivity so the user cannot go back to it
+                    finish();
                 } else {
                     // Fields are empty
-                    Toast.makeText(MainActivity.this, "Please enter employee name, division, and Password", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Please enter  username, division, and password", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
+
 
 
         // Create an instance of DBHandler
         dbHandler = new DBHandler(this);
         downloadAndStoreCSVData();
 
-        // Inside onCreate() method after initializing the database handler
-        AutoCompleteTextView autoCompleteTextView = findViewById(R.id.idDivision);
-
-// Assuming getDivisions() method returns an ArrayList<String> containing division names
-        ArrayList<String> divisionsList = dbHandler.getDivisions();
-
-// Remove duplicates from the divisions list
-        HashSet<String> uniqueDivisionsSet = new HashSet<>(divisionsList);
-        ArrayList<String> uniqueDivisionsList = new ArrayList<>(uniqueDivisionsSet);
-
-        if (uniqueDivisionsList != null && !uniqueDivisionsList.isEmpty()) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, uniqueDivisionsList);
-            autoCompleteTextView.setAdapter(adapter);
-        } else {
-            // Handle case where no unique divisions are found in the database
-            Toast.makeText(this, "No unique divisions found", Toast.LENGTH_SHORT).show();
-        }
+//        // Inside onCreate() method after initializing the database handler
+//        AutoCompleteTextView autoCompleteTextView = findViewById(R.id.idDivision);
+//
+//// Assuming getDivisions() method returns an ArrayList<String> containing division names
+//        ArrayList<String> divisionsList = dbHandler.getDivisions();
+//
+//// Remove duplicates from the divisions list
+//        HashSet<String> uniqueDivisionsSet = new HashSet<>(divisionsList);
+//        ArrayList<String> uniqueDivisionsList = new ArrayList<>(uniqueDivisionsSet);
+//
+//        if (uniqueDivisionsList != null && !uniqueDivisionsList.isEmpty()) {
+//            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, uniqueDivisionsList);
+//            autoCompleteTextView.setAdapter(adapter);
+//        } else {
+//            // Handle case where no unique divisions are found in the database
+//            Toast.makeText(this, "No unique divisions found", Toast.LENGTH_SHORT).show();
+//        }
 
     }
 
@@ -184,9 +181,33 @@ public class MainActivity extends AppCompatActivity {
             // Post-execution task to parse CSV data and store it locally
             if (!csvData.isEmpty()) {
                 parseCSVAndStoreLocally(csvData);
+
+                // Populate the dropdown list after CSV data is processed
+                populateDivisionDropdown();
             } else {
                 Toast.makeText(MainActivity.this, "Failed to download CSV data", Toast.LENGTH_SHORT).show();
             }
+        }
+
+    }
+
+    // Method to populate the division dropdown list
+    private void populateDivisionDropdown() {
+        AutoCompleteTextView autoCompleteTextView = findViewById(R.id.idDivision);
+
+        // Get the list of divisions from the database
+        ArrayList<String> divisionsList = dbHandler.getDivisions();
+
+        // Remove duplicates from the divisions list
+        HashSet<String> uniqueDivisionsSet = new HashSet<>(divisionsList);
+        ArrayList<String> uniqueDivisionsList = new ArrayList<>(uniqueDivisionsSet);
+
+        if (uniqueDivisionsList != null && !uniqueDivisionsList.isEmpty()) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, uniqueDivisionsList);
+            autoCompleteTextView.setAdapter(adapter);
+        } else {
+            // Handle case where no unique divisions are found in the database
+            Toast.makeText(this, "No unique divisions found", Toast.LENGTH_SHORT).show();
         }
     }
     //--------------------------------------------------------------------------------------------//
@@ -239,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void createEmployeeLocally(String employeeName, String division) {
         // Insert the new employee into the local database
-        dbHandler.insertData(employeeName, division);
+        dbHandler.insertUserData(employeeName, division);
     }
 
     // Define a method to start the Admin activity with the username

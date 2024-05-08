@@ -26,6 +26,10 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String ID_COL = "id";
     private static final String EMPLOYEENAME_COL = "EmployeeName";
     private static final String DIVISION_COL = "Division";
+    // Constants for the new table
+    private static final String USER_TABLE_NAME = "Users";
+    private static final String USERNAME_COL = "Username";
+
 
     // Constructor
     public DBHandler(Context context) {
@@ -39,13 +43,39 @@ public class DBHandler extends SQLiteOpenHelper {
                 EMPLOYEENAME_COL + " TEXT, " +
                 DIVISION_COL + " TEXT)";
         db.execSQL(createTableQuery);
+
+        // Create the user table
+        String createUserTableQuery = "CREATE TABLE " + USER_TABLE_NAME + " (" +
+                ID_COL + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                USERNAME_COL + " TEXT, " +
+                DIVISION_COL + " TEXT)";
+        db.execSQL(createUserTableQuery);
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
+
+    public ArrayList<String> getEmployeeByDivision(String division) {
+        ArrayList<String> employeeList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT EmployeeName FROM File WHERE Division = ?", new String[]{division});
+        if (cursor.moveToFirst()) {
+            do {
+                String employeeName = cursor.getString(0);
+                employeeList.add(employeeName);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return employeeList;
+    }
+
+
 
     // Method to insert data into the database
     // Method to insert a new employee record into the database
@@ -58,12 +88,49 @@ public class DBHandler extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
         // Closing database connection
         db.close();
+
     }
+
+    // Method to insert data into the user table
+    public void insertUserData(String username, String division) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(USERNAME_COL, username);
+        values.put(DIVISION_COL, division);
+        // Inserting Row
+        db.insert(USER_TABLE_NAME, null, values);
+        // Closing database connection
+        db.close();
+    }
+
 
 
     // AsyncTask to download CSV data from URL
     public void downloadCSVData(String url) {
         new DownloadCSVTask().execute(url);
+    }
+
+    public ArrayList<String> getEmployeesByDivision() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<String> employeeList = new ArrayList<>();
+        Cursor cursor = null;
+
+        try {
+            cursor = db.rawQuery("SELECT EmployeeName FROM File WHERE Division = ?", new String[]{DIVISION_COL});
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String employeeName = cursor.getString(0);
+                    employeeList.add(employeeName);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+
+        return employeeList;
     }
 
     // AsyncTask to download CSV data
@@ -168,7 +235,31 @@ public class DBHandler extends SQLiteOpenHelper {
         // Return divisions list
         return divisionsList;
     }
-}
+
+    // Method to get all Employee from the database
+    @SuppressLint("Range")
+    public ArrayList<String> getEmployee() {
+        ArrayList<String> employeeList = new ArrayList<>();
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // Loop through all rows and add division names to the list
+        if (cursor.moveToFirst()) {
+            do {
+                employeeList.add(cursor.getString(cursor.getColumnIndex(EMPLOYEENAME_COL)));
+            } while (cursor.moveToNext());
+        }
+
+        // Close cursor and database
+        cursor.close();
+        db.close();
+
+        // Return divisions list
+        return employeeList;
+    }
+    }
 
 
 

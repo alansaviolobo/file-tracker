@@ -5,28 +5,81 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/text_code"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:paddingBottom="8dp"/>
+        android:layout_height="60dp"
+        android:layout_marginTop="40dp"
+        android:drawableStart="@drawable/qrcode_svgrepo_com"
+        android:drawablePadding="8dp"
+        android:hint="Code"
+        android:importantForAutofill="no"
+        android:inputType="none"
+        android:textIsSelectable="false" />
 
-    <TextView
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_code"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textColor="@android:color/black"-->
+<!--        android:paddingBottom="8dp"/>-->
+
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/text_username"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textColor="@android:color/black"
-        android:paddingBottom="8dp"/>
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:drawableStart="@drawable/login_vector"
+        android:drawablePadding="8dp"
+        android:hint="Username"
+        android:inputType="none"
+        android:importantForAutofill="no"
+        android:textIsSelectable="false"/>
 
-    <EditText
-        android:id="@+id/input_employee_name"
+
+<!--    <TextView-->
+<!--        android:id="@+id/text_username"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textColor="@android:color/black"-->
+<!--        android:paddingBottom="8dp"/>-->
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/outlinedTextField2"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Employee Name"
-        android:textSize="16sp"
-        android:inputType="text"/>
+        android:layout_height="wrap_content">
+
+        <AutoCompleteTextView
+            android:id="@+id/employee_autocomplete"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:drawableStart="@drawable/login_vector"
+            android:drawablePadding="8dp"
+            android:hint="Select person:"
+            android:inputType="none"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+<!--    <Spinner-->
+<!--        android:id="@+id/spinner_employee"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:minHeight="48dp"-->
+<!--        android:paddingBottom="8dp"-->
+<!--        android:textColor="@android:color/black"-->
+<!--        android:textSize="16sp" />-->
+
+<!--    <EditText-->
+<!--        android:id="@+id/input_employee_name"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:hint="Employee Name"-->
+<!--        android:textSize="16sp"-->
+<!--        android:inputType="text"/>-->
 
 </LinearLayout>
