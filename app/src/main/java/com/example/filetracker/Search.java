@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -50,6 +54,14 @@ public class Search extends AppCompatActivity implements View.OnClickListener, S
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.searchButton) {
+            // Get a reference to the search button
+            Button searchButton = (Button) view;
+
+            // Define the animation
+            Animation anim = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.loading_animation);
+
+            // Apply the animation to the search button
+            searchButton.startAnimation(anim);
             String query = searchEditText.getText().toString().trim();
             // Check if the query is empty
             if (!query.isEmpty()) {
@@ -131,7 +143,6 @@ public class Search extends AppCompatActivity implements View.OnClickListener, S
 
     private void displayResults(final ArrayList<String[]> results, final boolean searchByCode) {
         resultsTable.removeAllViews();
-
         // Define table headers based on the search type
         String[] headers;
         if (searchByCode) {
@@ -177,24 +188,7 @@ public class Search extends AppCompatActivity implements View.OnClickListener, S
 
         resultsTable.addView(headerRow);
 
-//        // Add results data rows
-//        for (final String[] result : results) {
-//            TableRow row = new TableRow(this);
-//            TableRow.LayoutParams layoutParams = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT);
-//            row.setLayoutParams(layoutParams);
 
-//        // Set OnClickListener for each TableRow
-//        row.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (!searchByCode) {
-//                    // If searching by filename, perform search by code using the first column value (assuming it's the code)
-//                    String query = result[1];
-//                    searchByCode(query);
-//
-//                }
-//            }
-//        });
 
         // Add results data rows based on the search type
         if (searchByCode) {
@@ -246,9 +240,17 @@ public class Search extends AppCompatActivity implements View.OnClickListener, S
                     row.setBackground(ContextCompat.getDrawable(this, R.drawable.table_background));
                     row.addView(textView);
 
+                // Add animation to the row
+                Animation tableAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.table_row_animation);
+                row.startAnimation(tableAnimation);
+
                 resultsTable.addView(row);
             }
         }
+        // Apply layout animation to the table
+        LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(this, R.anim.table_layout_animation);
+        resultsTable.setLayoutAnimation(animationController);
+        resultsTable.scheduleLayoutAnimation();
     }
     @Override
     public void onBackPressed() {
